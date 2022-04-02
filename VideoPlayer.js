@@ -532,8 +532,8 @@ export default class VideoPlayer extends Component {
    * navigator prop by default.
    */
   _onBack() {
-    if (this.props.navigator) {
-      this.props.navigator.goBack();
+    if (this.props.navigator && this.props.navigator.pop) {
+      this.props.navigator.pop();
     } else {
       console.warn(
         'Warning: _onBack requires navigator property to function. Either modify the onBack prop or pass a navigator prop',
@@ -974,6 +974,7 @@ export default class VideoPlayer extends Component {
           imageStyle={[styles.controls.vignette]}>
           <SafeAreaView style={styles.controls.topControlGroup}>
             {backControl}
+            {this.renderTitle()}
             <View style={styles.controls.pullRight}>
               {volumeControl}
               {fullscreenControl}
@@ -1068,7 +1069,7 @@ export default class VideoPlayer extends Component {
           <SafeAreaView
             style={[styles.controls.row, styles.controls.bottomControlGroup]}>
             {playPauseControl}
-            {this.renderTitle()}
+
             {timerControl}
           </SafeAreaView>
         </ImageBackground>
@@ -1096,7 +1097,7 @@ export default class VideoPlayer extends Component {
               styles.seekbar.fill,
               {
                 width: this.state.seekerFillWidth,
-                backgroundColor: this.props.seekColor || '#FFF',
+                backgroundColor: this.props.seekColor || '#ffcc00',
               },
             ]}
             pointerEvents={'none'}
@@ -1366,13 +1367,14 @@ const styles = {
       zIndex: 0,
     },
     title: {
-      alignItems: 'center',
-      flex: 0.6,
+      alignItems: 'flex-start',
+      flex: 1,
       flexDirection: 'column',
       padding: 0,
     },
     titleText: {
-      textAlign: 'center',
+      fontWeight: 'bold',
+      fontSize: 16,
     },
     timer: {
       width: 80,
@@ -1395,13 +1397,13 @@ const styles = {
       width: 150,
     },
     track: {
-      backgroundColor: '#333',
+      backgroundColor: '#ffcc00',
       height: 1,
       marginLeft: 7,
     },
     fill: {
-      backgroundColor: '#FFF',
-      height: 1,
+      backgroundColor: '#ffcc00',
+      height: 3,
     },
     handle: {
       position: 'absolute',
@@ -1422,14 +1424,14 @@ const styles = {
     },
     track: {
       backgroundColor: '#333',
-      height: 1,
+      height: 2,
       position: 'relative',
       top: 14,
       width: '100%',
     },
     fill: {
-      backgroundColor: '#FFF',
-      height: 1,
+      backgroundColor: '#ffcc00',
+      height: 3,
       width: '100%',
     },
     handle: {
@@ -1441,7 +1443,7 @@ const styles = {
     circle: {
       borderRadius: 12,
       position: 'relative',
-      top: 8,
+      top: 9,
       left: 8,
       height: 12,
       width: 12,
