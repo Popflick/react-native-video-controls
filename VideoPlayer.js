@@ -161,7 +161,7 @@ export default class VideoPlayer extends Component {
     };
   }
 
-  componentDidUpdate = prevProps => {
+  componentDidUpdate = (prevProps) => {
     const {isFullscreen} = this.props;
 
     if (prevProps.isFullscreen !== isFullscreen) {
@@ -532,8 +532,8 @@ export default class VideoPlayer extends Component {
    * navigator prop by default.
    */
   _onBack() {
-    if (this.props.navigator && this.props.navigator.pop) {
-      this.props.navigator.pop();
+    if (this.props.navigator) {
+      this.props.navigator.goBack();
     } else {
       console.warn(
         'Warning: _onBack requires navigator property to function. Either modify the onBack prop or pass a navigator prop',
@@ -1087,7 +1087,7 @@ export default class VideoPlayer extends Component {
         {...this.player.seekPanResponder.panHandlers}>
         <View
           style={styles.seekbar.track}
-          onLayout={event =>
+          onLayout={(event) =>
             (this.player.seekerWidth = event.nativeEvent.layout.width)
           }
           pointerEvents={'none'}>
@@ -1217,7 +1217,7 @@ export default class VideoPlayer extends Component {
         <View style={[styles.player.container, this.styles.containerStyle]}>
           <Video
             {...this.props}
-            ref={videoPlayer => (this.player.ref = videoPlayer)}
+            ref={(videoPlayer) => (this.player.ref = videoPlayer)}
             resizeMode={this.state.resizeMode}
             volume={this.state.volume}
             paused={this.state.paused}
