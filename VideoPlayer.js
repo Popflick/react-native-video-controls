@@ -111,6 +111,8 @@ export default class VideoPlayer extends Component {
       togglePlayPause: this._togglePlayPause.bind(this),
       toggleControls: this._toggleControls.bind(this),
       toggleTimer: this._toggleTimer.bind(this),
+      rewindVideo: this._rewindVideo.bind(this),
+      forwardVideo: this._forwardVideo.bind(this),
     };
 
     /**
@@ -514,6 +516,22 @@ export default class VideoPlayer extends Component {
       typeof this.events.onPlay === 'function' && this.events.onPlay();
     }
 
+    this.setState(state);
+  }
+
+  _rewindVideo() {
+    let state = this.state;
+    const nextTime = state.currentTime - 15;
+    state.currentTime = nextTime < 0 ? 0 : nextTime;
+    this.player.ref.seek(state.currentTime);
+    this.setState(state);
+  }
+
+  _forwardVideo() {
+    let state = this.state;
+    const nextTime = state.currentTime + 15;
+    state.currentTime = nextTime > state.duration ? state.duration : nextTime;
+    this.player.ref.seek(state.currentTime);
     this.setState(state);
   }
 
@@ -956,9 +974,7 @@ export default class VideoPlayer extends Component {
     const volumeControl = this.props.disableVolume
       ? this.renderNullControl()
       : this.renderVolume();
-    const fullscreenControl = this.props.disableFullscreen
-      ? this.renderNullControl()
-      : this.renderFullscreen();
+    const fullscreenControl = this.renderNullControl();
 
     return (
       <Animated.View
@@ -976,8 +992,8 @@ export default class VideoPlayer extends Component {
           <SafeAreaView style={styles.controls.topControlGroup}>
             {backControl}
             {this.renderTitle()}
-            <View style={styles.controls.pullRight}>
-              {volumeControl}
+            <View>
+              {/* {volumeControl} */}
               {fullscreenControl}
             </View>
           </SafeAreaView>
@@ -993,7 +1009,9 @@ export default class VideoPlayer extends Component {
     return this.renderControl(
       <SvgUri
         style={styles.controls.back}
-        uri="https://popflick-public.s3.us-east-2.amazonaws.com/static/svg/movie_back_time.svg"
+        width={20}
+        height={20}
+        uri="https://popflick-public.s3.us-east-2.amazonaws.com/static/svg/arrowSlider.svg"
       />,
       this.events.onBack,
       styles.controls.back,
@@ -1030,10 +1048,16 @@ export default class VideoPlayer extends Component {
   renderFullscreen() {
     let source =
       this.state.isFullscreen === true
-        ? require('./assets/img/shrink.png')
-        : require('./assets/img/expand.png');
+        ? {
+            uri:
+              'https://popflick-public.s3.us-east-2.amazonaws.com/static/images/icon-full-screen.png',
+          }
+        : {
+            uri:
+              'https://popflick-public.s3.us-east-2.amazonaws.com/static/images/icon-full-screen.png',
+          };
     return this.renderControl(
-      <Image source={source} />,
+      <Image source={source} style={{width: 24, height: 24}} />,
       this.methods.toggleFullscreen,
       styles.controls.fullscreen,
     );
@@ -1049,9 +1073,6 @@ export default class VideoPlayer extends Component {
     const seekbarControl = this.props.disableSeekbar
       ? this.renderNullControl()
       : this.renderSeekbar();
-    const playPauseControl = this.props.disablePlayPause
-      ? this.renderNullControl()
-      : this.renderPlayPause();
 
     return (
       <Animated.View
@@ -1064,16 +1085,33 @@ export default class VideoPlayer extends Component {
         ]}>
         <ImageBackground
           source={require('./assets/img/bottom-vignette.png')}
-          style={[styles.controls.column]}
+          style={[styles.controls.row]}
           imageStyle={[styles.controls.vignette]}>
-          {seekbarControl}
-          <SafeAreaView
-            style={[styles.controls.row, styles.controls.bottomControlGroup]}>
-            {playPauseControl}
-
+          <SafeAreaView style={[styles.controls.row]}>
+            <View style={{flex: 1}}>{seekbarControl}</View>
             {timerControl}
+            {this.renderFullscreen()}
           </SafeAreaView>
         </ImageBackground>
+      </Animated.View>
+    );
+  }
+
+  /**
+   * Render middle control group and wrap it in a holder
+   */
+  renderMiddleControls() {
+    return (
+      <Animated.View
+        style={[
+          styles.controls.middle,
+          {
+            opacity: this.animations.bottomControl.opacity,
+          },
+        ]}>
+        {this.renderSeekControl()}
+        {this.renderPlayPause()}
+        {this.renderSeekControl('right')}
       </Animated.View>
     );
   }
@@ -1125,15 +1163,29 @@ export default class VideoPlayer extends Component {
   renderPlayPause() {
     let source =
       this.state.paused === true
-        ? {
-            uri:
-              'https://popflick-public.s3.us-east-2.amazonaws.com/static/svg/play.svg',
-          }
-        : require('./assets/img/pause.png');
+        ? 'https://popflick-public.s3.us-east-2.amazonaws.com/static/svg/play.svg'
+        : 'https://popflick-public.s3.us-east-2.amazonaws.com/static/svg/pause.svg';
     return this.renderControl(
-      <Image source={source} />,
+      <SvgUri uri={source} width={30} height={30} />,
       this.methods.togglePlayPause,
       styles.controls.playPause,
+    );
+  }
+
+  /**
+   * Render the play/pause button and show the respective icon
+   */
+  renderSeekControl(orientation = 'left') {
+    let source =
+      orientation === 'left'
+        ? 'https://popflick-public.s3.us-east-2.amazonaws.com/static/svg/movie_back_time.svg'
+        : 'https://popflick-public.s3.us-east-2.amazonaws.com/static/svg/movie_forward_time.svg';
+    return this.renderControl(
+      <SvgUri uri={source} width={30} height={30} />,
+      orientation === 'left'
+        ? this.methods.rewindVideo
+        : this.methods.forwardVideo,
+      styles.controls.seekControl,
     );
   }
 
@@ -1240,6 +1292,7 @@ export default class VideoPlayer extends Component {
           {this.renderError()}
           {this.renderLoader()}
           {this.renderTopControls()}
+          {this.renderMiddleControls()}
           {this.renderBottomControls()}
         </View>
       </TouchableWithoutFeedback>
@@ -1331,6 +1384,7 @@ const styles = {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
+      backgroundColor: 'green',
     },
     top: {
       flex: 1,
@@ -1341,6 +1395,15 @@ const styles = {
       alignItems: 'stretch',
       flex: 2,
       justifyContent: 'flex-end',
+    },
+    middle: {
+      flexDirection: 'row',
+      flex: 2,
+      position: 'relative',
+      bottom: -23,
+      left: -15,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     topControlGroup: {
       alignSelf: 'stretch',
@@ -1367,11 +1430,19 @@ const styles = {
     },
     playPause: {
       position: 'relative',
-      width: 80,
+      width: 30,
+      height: 30,
+      zIndex: 0,
+      marginHorizontal: 130,
+    },
+    seekControl: {
+      position: 'relative',
+      width: 30,
+      height: 30,
       zIndex: 0,
     },
     back: {
-      width: 30,
+      transform: [{rotate: '90deg'}],
     },
     title: {
       alignItems: 'flex-start',
@@ -1426,8 +1497,6 @@ const styles = {
     container: {
       alignSelf: 'stretch',
       height: 28,
-      marginLeft: 20,
-      marginRight: 20,
     },
     track: {
       backgroundColor: '#333',
