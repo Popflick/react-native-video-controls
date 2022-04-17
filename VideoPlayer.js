@@ -14,6 +14,7 @@ import {
   Text,
 } from 'react-native';
 import padStart from 'lodash/padStart';
+import {SvgUri} from 'react-native-svg';
 
 export default class VideoPlayer extends Component {
   static defaultProps = {
@@ -161,7 +162,7 @@ export default class VideoPlayer extends Component {
     };
   }
 
-  componentDidUpdate = (prevProps) => {
+  componentDidUpdate = prevProps => {
     const {isFullscreen} = this.props;
 
     if (prevProps.isFullscreen !== isFullscreen) {
@@ -990,9 +991,9 @@ export default class VideoPlayer extends Component {
    */
   renderBack() {
     return this.renderControl(
-      <Image
-        source={require('./assets/img/back.png')}
+      <SvgUri
         style={styles.controls.back}
+        uri="https://popflick-public.s3.us-east-2.amazonaws.com/static/svg/movie_back_time.svg"
       />,
       this.events.onBack,
       styles.controls.back,
@@ -1088,7 +1089,7 @@ export default class VideoPlayer extends Component {
         {...this.player.seekPanResponder.panHandlers}>
         <View
           style={styles.seekbar.track}
-          onLayout={(event) =>
+          onLayout={event =>
             (this.player.seekerWidth = event.nativeEvent.layout.width)
           }
           pointerEvents={'none'}>
@@ -1124,7 +1125,10 @@ export default class VideoPlayer extends Component {
   renderPlayPause() {
     let source =
       this.state.paused === true
-        ? require('./assets/img/play.png')
+        ? {
+            uri:
+              'https://popflick-public.s3.us-east-2.amazonaws.com/static/svg/play.svg',
+          }
         : require('./assets/img/pause.png');
     return this.renderControl(
       <Image source={source} />,
@@ -1218,7 +1222,7 @@ export default class VideoPlayer extends Component {
         <View style={[styles.player.container, this.styles.containerStyle]}>
           <Video
             {...this.props}
-            ref={(videoPlayer) => (this.player.ref = videoPlayer)}
+            ref={videoPlayer => (this.player.ref = videoPlayer)}
             resizeMode={this.state.resizeMode}
             volume={this.state.volume}
             paused={this.state.paused}
@@ -1365,6 +1369,9 @@ const styles = {
       position: 'relative',
       width: 80,
       zIndex: 0,
+    },
+    back: {
+      width: 30,
     },
     title: {
       alignItems: 'flex-start',
