@@ -1048,16 +1048,17 @@ export default class VideoPlayer extends Component {
   renderFullscreen() {
     let source =
       this.state.isFullscreen === true
-        ? {
-            uri:
-              'https://popflick-public.s3.us-east-2.amazonaws.com/static/svg/exit-full-screen.svg',
-          }
+        ? 'https://popflick-public.s3.us-east-2.amazonaws.com/static/svg/exit-full-screen.svg'
         : {
             uri:
               'https://popflick-public.s3.us-east-2.amazonaws.com/static/images/icon-full-screen.png',
           };
     return this.renderControl(
-      <Image source={source} style={{width: 24, height: 24}} />,
+      this.state.isFullscreen === true ? (
+        <SvgUri width={17} height={17} uri={source} />
+      ) : (
+        <Image source={source} style={{width: 24, height: 24}} />
+      ),
       this.methods.toggleFullscreen,
       styles.controls.fullscreen,
     );
