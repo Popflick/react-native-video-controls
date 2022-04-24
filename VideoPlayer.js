@@ -1050,7 +1050,7 @@ export default class VideoPlayer extends Component {
       this.state.isFullscreen === true
         ? {
             uri:
-              'https://popflick-public.s3.us-east-2.amazonaws.com/static/images/icon-full-screen.png',
+              'https://popflick-public.s3.us-east-2.amazonaws.com/static/svg/exit-full-screen.svg',
           }
         : {
             uri:
