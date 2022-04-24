@@ -15,6 +15,9 @@ import {
 } from 'react-native';
 import padStart from 'lodash/padStart';
 import {SvgUri} from 'react-native-svg';
+import muxReactNativeVideo from 'mux-react-native-video-sdk';
+
+const MuxVideo = muxReactNativeVideo(Video);
 
 export default class VideoPlayer extends Component {
   static defaultProps = {
@@ -1273,7 +1276,7 @@ export default class VideoPlayer extends Component {
         onPress={this.events.onScreenTouch}
         style={[styles.player.container, this.styles.containerStyle]}>
         <View style={[styles.player.container, this.styles.containerStyle]}>
-          <Video
+          <MuxVideo
             {...this.props}
             ref={videoPlayer => (this.player.ref = videoPlayer)}
             resizeMode={this.state.resizeMode}
@@ -1289,6 +1292,7 @@ export default class VideoPlayer extends Component {
             onSeek={this.events.onSeek}
             style={[styles.player.video, this.styles.videoStyle]}
             source={this.props.source}
+            muxOptions={this.props.muxOptions}
           />
           {this.renderError()}
           {this.renderLoader()}
