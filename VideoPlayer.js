@@ -37,6 +37,7 @@ export default class VideoPlayer extends Component {
     rate: 1,
     showTimeRemaining: true,
     showHours: false,
+    continueIn: 0,
   };
 
   constructor(props) {
@@ -104,6 +105,7 @@ export default class VideoPlayer extends Component {
       onLoad: this._onLoad.bind(this),
       onPause: this.props.onPause,
       onPlay: this.props.onPlay,
+      continueWatching: this._onContinueWatching.bind(this),
     };
 
     /**
@@ -538,6 +540,14 @@ export default class VideoPlayer extends Component {
     this.setState(state);
   }
 
+  _onContinueWatching() {
+    let state = this.state;
+    state.currentTime = this.props.continueIn / 1000;
+    console.log(this.props.continueIn / 1000);
+    this.player.ref.seek(state.currentTime);
+    this.setState(state);
+  }
+
   /**
    * Toggle between showing time remaining or
    * video duration in the timer control
@@ -789,6 +799,8 @@ export default class VideoPlayer extends Component {
     this.mounted = true;
 
     this.setState(state);
+
+    this.events.continueWatching();
   }
 
   /**
